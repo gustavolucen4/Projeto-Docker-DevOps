@@ -1,0 +1,40 @@
+# =========================
+# Etapa 1 - Build do React
+# =========================
+FROM node:20-alpine AS build
+
+ARG VITE_API_URL=http://localhost:8080/api/v1
+ENV VITE_API_URL=$VITE_API_URL
+
+# Diretório da aplicação
+WORKDIR /app
+
+# Copia package files
+COPY package*.json ./
+
+# Instala dependências
+RUN npm install
+
+# Copia restante do projeto
+COPY . .
+
+# Gera build de produção
+RUN npm run build
+
+# ================
+# Etapa 2 - Nginx
+# ================
+
+FROM nginx:stable-alpine
+
+# Remove página padrão do nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copia build gerado
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expõe porta 80
+EXPOSE 80
+# Inicia nginx
+
+CMD ["nginx", "-g", "daemon off;"]
