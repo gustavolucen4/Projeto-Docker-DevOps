@@ -1,0 +1,54 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27070:27017
+    networks:
+      - localstack_network
+  localstack:
+    image: localstack/localstack:4.4.0
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+      - "8055:8081"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - PERSISTENCE=1
+    volumes:
+      - ./tmp/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/create-bucket.sh
+    networks:
+      - localstack_network
+  projeto-backend:
+    build: .
+    image: gustavolucen4/projeto-back:latest
+    container_name: projeto-backend
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/db-demo
+      CLOUD_AWS_S3_ENDPOINT: http://localstack:4566
+    depends_on:
+      - mongodb
+      - localstack
+    networks:
+      - localstack_network
+  projeto-frontend:
+    build:
+      context: ../Gustavo-lucena-frontend
+      args:
+        VITE_API_URL: http://localhost:8080/api/v1
+    image: gustavolucen4/projeto-front:latest
+    container_name: projeto-frontend
+    ports:
+      - 80:80
+    depends_on:
+      - projeto-backend
+    networks:
+      - localstack_network
+networks:
+  localstack_network:
