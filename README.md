@@ -1,5 +1,8 @@
 #Rede social (Bootcamp Sysmap)
 
+## Link repositório back-end: https://github.com/gustavolucen4/Gustavo-lucena-backend
+## Link repositório front-end: https://github.com/gustavolucen4/Gustavo-lucena-frontend
+
 Aplicação full stack que simula uma rede social no estilo Twitter: frontend em React (Vite) e backend em Java (Spring Boot). O **Docker Compose** deste repositório sobe todo o ambiente necessário para rodar o projeto localmente.
 
 ## Pré-requisitos
